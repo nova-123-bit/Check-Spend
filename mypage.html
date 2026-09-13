@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MyPages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Inter:wght@400;500;600;700&family=Lora:ital@0;1&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --radius-s:6px; --radius-m:10px; --radius-l:16px;
+  --font-ui:'Inter',system-ui,sans-serif;
+  --font-display:'Fraunces',serif;
+  --font-body:'Fraunces',serif;
+  --shadow-1:0 1px 2px rgba(0,0,0,.18);
+  --shadow-2:0 8px 24px rgba(0,0,0,.24);
+  --dur:180ms;
+}
+/* ---- theme: dark (default) ---- */
+:root, [data-theme="dark"]{
+  --bg:#191007; --bg-elev:#221609; --surface:#2A1C0D; --paper:#2E200F;
+  --paper-line: rgba(255,255,255,.05);
+  --text:#F4E9D8; --text-dim:#C7B191; --text-faint:#8A785B;
+  --border: rgba(255,255,255,.09); --border-strong: rgba(255,255,255,.16);
+  --overlay: rgba(10,6,2,.6);
+  --input-bg: rgba(255,255,255,.04);
+}
+[data-theme="light"]{
+  --bg:#FBF5EA; --bg-elev:#FFFFFF; --surface:#FFFFFF; --paper:#FFFDF7;
+  --paper-line: rgba(0,0,0,.05);
+  --text:#2B2013; --text-dim:#6E5C40; --text-faint:#9C8B6C;
+  --border: rgba(0,0,0,.09); --border-strong: rgba(0,0,0,.16);
+  --overlay: rgba(30,20,8,.35);
+  --input-bg: rgba(0,0,0,.03);
+}
+/* ---- accents ---- */
+:root, [data-accent="amber"]{ --accent:#D9963A; --accent-ink:#3A2306; --accent-soft: rgba(217,150,58,.16); --accent-strong:#C77E1E; }
+[data-accent="blue"]{ --accent:#5E86AE; --accent-ink:#0E1E2C; --accent-soft: rgba(94,134,174,.18); --accent-strong:#4A6F92; }
+[data-accent="pink"]{ --accent:#C97B94; --accent-ink:#2C1219; --accent-soft: rgba(201,123,148,.18); --accent-strong:#B15E79; }
+[data-accent="red"]{ --accent:#B2584B; --accent-ink:#280E09; --accent-soft: rgba(178,88,75,.18); --accent-strong:#994A3E; }
+[data-accent="purple"]{ --accent:#9274AE; --accent-ink:#1E1526; --accent-soft: rgba(146,116,174,.18); --accent-strong:#7B5C97; }
+[data-accent="green"]{ --accent:#748F63; --accent-ink:#151E10; --accent-soft: rgba(116,143,99,.18); --accent-strong:#5F7A4F; }
+[data-accent="teal"]{ --accent:#4E8E88; --accent-ink:#0D1E1C; --accent-soft: rgba(78,142,136,.18); --accent-strong:#3D7570; }
+
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--font-ui);
+  -webkit-font-smoothing:antialiased; overscroll-behavior:none;
+}
+body.font-modern .entry-content, body.font-modern .composer{ font-family:'Inter',sans-serif; }
+body.font-serif .entry-content, body.font-serif .composer{ font-family:'Lora',serif; }
+body.font-diary .entry-content, body.font-diary .composer{ font-family:'Fraunces',serif; font-optical-sizing:auto; }
+body.font-mono .entry-content, body.font-mono .composer{ font-family:'Space Mono',ui-monospace,monospace; }
+
+a{color:inherit;}
+button{font-family:inherit;}
+::selection{ background:var(--accent-soft); }
+:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+@media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
+
+#app{min-height:100vh; display:flex; flex-direction:column;}
+
+/* ---------- layout shell ---------- */
+.shell{ display:flex; min-height:100vh; }
+.sidebar{
+  width:232px; flex-shrink:0; border-right:1px solid var(--border);
+  display:flex; flex-direction:column; padding:20px 14px; gap:4px;
+  background:var(--bg-elev);
+}
+.brand{ display:flex; align-items:center; gap:10px; padding:6px 8px 18px; }
+.brand-mark{ width:34px;height:34px;border-radius:9px; background:var(--accent); display:flex;align-items:center;justify-content:center; flex-shrink:0; box-shadow:var(--shadow-1); }
+.brand-mark svg{ width:20px; height:20px; }
+.brand-name{ font-family:var(--font-display); font-style:italic; font-weight:600; font-size:21px; letter-spacing:.2px; }
+.nav-item{
+  display:flex; align-items:center; gap:11px; padding:9px 10px; border-radius:var(--radius-m);
+  color:var(--text-dim); cursor:pointer; font-size:14.5px; border:none; background:none; width:100%; text-align:left;
+  transition:background var(--dur), color var(--dur);
+}
+.nav-item:hover{ background:var(--surface); color:var(--text); }
+.nav-item.active{ background:var(--accent-soft); color:var(--text); font-weight:600; }
+.nav-item svg{ width:17px;height:17px; opacity:.85; flex-shrink:0; }
+.nav-sep{ height:1px; background:var(--border); margin:10px 4px; }
+.sidebar-foot{ margin-top:auto; display:flex; flex-direction:column; gap:4px; }
+.quick-add{
+  margin:10px 4px 14px; background:var(--accent); color:var(--accent-ink); border:none; border-radius:var(--radius-m);
+  padding:10px 12px; font-weight:600; font-size:14px; cursor:pointer; display:flex; align-items:center; gap:8px;
+  box-shadow:var(--shadow-1); transition:transform var(--dur), box-shadow var(--dur);
+}
+.quick-add:hover{ transform:translateY(-1px); box-shadow:var(--shadow-2); }
+
+.main-col{ flex:1; display:flex; min-width:0; }
+.content{ flex:1; min-width:0; padding:36px 40px 100px; max-width:860px; margin:0 auto; width:100%; }
+.content.wide{ max-width:1000px; }
+.right-panel{
+  width:280px; flex-shrink:0; border-left:1px solid var(--border); padding:24px 22px; background:var(--bg-elev);
+  display:flex; flex-direction:column; gap:20px;
+}
+.right-panel.hidden{ display:none; }
+
+/* topbar for mobile */
+.topbar{ display:none; }
+
+/* ---------- typography ---------- */
+h1,h2,h3{ font-family:var(--font-display); margin:0; font-weight:600; }
+.page-date{ font-family:var(--font-display); font-style:italic; font-size:30px; margin:0 0 2px; }
+.page-sub{ color:var(--text-faint); font-size:14px; margin:0 0 26px; }
+.section-title{ font-size:13.5px; font-weight:600; color:var(--text-dim); margin:0 0 12px; letter-spacing:.2px; }
+
+/* ---------- composer / editor ---------- */
+.composer{
+  background:var(--paper); border:1px solid var(--paper-line); border-radius:var(--radius-l);
+  box-shadow:var(--shadow-1); padding:22px 24px 16px; margin-bottom:30px;
+}
+.composer-prompt{ color:var(--text-faint); font-size:14px; margin-bottom:10px; font-family:var(--font-ui); }
+.toolbar{ display:flex; gap:2px; margin-bottom:12px; flex-wrap:wrap; }
+.tbtn{
+  width:30px;height:30px;border-radius:7px;border:none;background:transparent;color:var(--text-dim);
+  cursor:pointer; display:flex;align-items:center;justify-content:center; font-size:14px; transition:background var(--dur);
+}
+.tbtn:hover{ background:var(--input-bg); color:var(--text); }
+.tbtn.active{ background:var(--accent-soft); color:var(--text); }
+.editor{
+  min-height:120px; outline:none; font-size:17px; line-height:1.65; color:var(--text);
+}
+.editor:empty:before{ content:attr(data-placeholder); color:var(--text-faint); }
+.editor blockquote{ border-left:3px solid var(--accent); margin:10px 0; padding:2px 0 2px 14px; color:var(--text-dim); }
+.editor ul,.editor ol{ padding-left:22px; }
+.editor a{ color:var(--accent); text-decoration:underline; }
+.checklist-row{ display:flex; align-items:flex-start; gap:8px; margin:4px 0; }
+.checklist-row input{ margin-top:5px; accent-color:var(--accent); }
+.composer-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:14px; padding-top:12px; border-top:1px solid var(--paper-line); }
+.meta-chip-row{ display:flex; gap:6px; flex-wrap:wrap; }
+.meta-chip{
+  font-size:12.5px; padding:5px 10px; border-radius:999px; background:var(--input-bg); color:var(--text-dim);
+  cursor:pointer; border:1px solid transparent; display:flex; align-items:center; gap:5px;
+}
+.meta-chip:hover{ border-color:var(--border-strong); }
+.meta-chip.set{ background:var(--accent-soft); color:var(--text); }
+.save-status{ font-size:12.5px; color:var(--text-faint); display:flex; align-items:center; gap:6px; }
+.save-dot{ width:6px;height:6px;border-radius:50%; background:var(--text-faint); }
+.save-status.saved .save-dot{ background:#7FA972; }
+.save-status.saving .save-dot{ background:var(--accent); }
+.save-status.offline .save-dot{ background:#C1554B; }
+
+/* ---------- entry cards ---------- */
+.entry-card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-m);
+  padding:16px 18px; margin-bottom:10px; cursor:pointer; transition:border-color var(--dur), transform var(--dur);
+}
+.entry-card:hover{ border-color:var(--border-strong); transform:translateY(-1px); }
+.entry-card-top{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:5px; }
+.entry-card-title{ font-weight:600; font-size:15.5px; }
+.entry-card-time{ font-size:12.5px; color:var(--text-faint); white-space:nowrap; flex-shrink:0; }
+.entry-card-preview{ font-size:14px; color:var(--text-dim); line-height:1.5; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.entry-card-meta{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+.pill{ font-size:11.5px; padding:3px 9px; border-radius:999px; background:var(--input-bg); color:var(--text-faint); display:inline-flex; align-items:center; gap:4px; }
+.pill.mood{ background:var(--accent-soft); color:var(--text); }
+mark{ background:var(--accent-soft); color:var(--text); border-radius:3px; padding:0 2px; }
+
+/* ---------- timeline ---------- */
+.tl-month{ font-family:var(--font-display); font-style:italic; font-size:19px; margin:28px 0 12px; color:var(--text); }
+.tl-day{ display:flex; gap:18px; margin-bottom:6px; }
+.tl-day-label{ width:88px; flex-shrink:0; padding-top:14px; font-size:13px; color:var(--text-faint); }
+.tl-day-entries{ flex:1; }
+
+/* ---------- calendar ---------- */
+.cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.cal-nav{ display:flex; gap:6px; }
+.icon-btn{ width:32px;height:32px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text-dim); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.icon-btn:hover{ border-color:var(--border-strong); color:var(--text); }
+.cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+.cal-dow{ text-align:center; font-size:11.5px; color:var(--text-faint); padding-bottom:6px; }
+.cal-cell{ aspect-ratio:1; border-radius:10px; border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; position:relative; font-size:13px; color:var(--text-dim); background:var(--surface); }
+.cal-cell:hover{ border-color:var(--border-strong); }
+.cal-cell.empty{ visibility:hidden; }
+.cal-cell.today{ border-color:var(--accent); color:var(--text); font-weight:700; }
+.cal-cell .dot{ width:5px;height:5px;border-radius:50%; background:var(--accent); margin-top:3px; }
+.cal-cell.selected{ background:var(--accent-soft); }
+
+/* ---------- search ---------- */
+.search-bar{ display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-m); padding:12px 16px; margin-bottom:16px; }
+.search-bar input{ flex:1; background:none; border:none; outline:none; color:var(--text); font-size:16px; font-family:var(--font-ui); }
+.filter-row{ display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+.filter-pill{ font-size:13px; padding:7px 13px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--text-dim); cursor:pointer; }
+.filter-pill.active{ background:var(--accent-soft); color:var(--text); border-color:transparent; }
+.recent-search-tag{ font-size:13px; padding:6px 12px; border-radius:999px; background:var(--input-bg); color:var(--text-dim); cursor:pointer; }
+
+/* ---------- empty states ---------- */
+.empty-state{ text-align:center; padding:60px 20px; color:var(--text-dim); }
+.empty-state h3{ font-family:var(--font-display); font-style:italic; font-size:20px; margin-bottom:8px; color:var(--text); }
+.empty-state p{ font-size:14px; color:var(--text-faint); margin:0 0 18px; }
+.btn{ background:var(--accent); color:var(--accent-ink); border:none; border-radius:var(--radius-m); padding:10px 18px; font-weight:600; font-size:14px; cursor:pointer; }
+.btn.ghost{ background:transparent; color:var(--text); border:1px solid var(--border-strong); }
+.btn.danger{ background:#B2584B; color:#fff; }
+.btn:disabled{ opacity:.5; cursor:default; }
+
+/* ---------- modal / overlay ---------- */
+.overlay-bg{ position:fixed; inset:0; background:var(--overlay); backdrop-filter:blur(2px); display:flex; align-items:center; justify-content:center; z-index:60; padding:20px; }
+.modal{ background:var(--bg-elev); border:1px solid var(--border); border-radius:var(--radius-l); box-shadow:var(--shadow-2); width:100%; max-width:480px; padding:24px; max-height:86vh; overflow:auto; }
+.modal.wide{ max-width:640px; }
+.modal h3{ font-size:18px; margin-bottom:14px; }
+.modal-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:20px; }
+.field{ margin-bottom:14px; }
+.field label{ display:block; font-size:12.5px; color:var(--text-dim); margin-bottom:6px; }
+.field input, .field select, .field textarea{ width:100%; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; padding:9px 11px; color:var(--text); font-size:14px; font-family:inherit; }
+.field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--accent); }
+
+/* command palette */
+.cmdk{ position:fixed; inset:0; background:var(--overlay); z-index:80; display:flex; align-items:flex-start; justify-content:center; padding-top:12vh; }
+.cmdk-box{ width:100%; max-width:520px; background:var(--bg-elev); border:1px solid var(--border-strong); border-radius:var(--radius-l); box-shadow:var(--shadow-2); overflow:hidden; }
+.cmdk-input{ width:100%; border:none; background:none; outline:none; padding:16px 18px; font-size:16px; color:var(--text); border-bottom:1px solid var(--border); font-family:inherit; }
+.cmdk-list{ max-height:340px; overflow:auto; padding:6px; }
+.cmdk-item{ padding:10px 14px; border-radius:8px; cursor:pointer; font-size:14px; color:var(--text-dim); display:flex; justify-content:space-between; }
+.cmdk-item:hover, .cmdk-item.sel{ background:var(--accent-soft); color:var(--text); }
+.cmdk-hint{ font-size:11px; color:var(--text-faint); }
+
+/* toast */
+.toast-wrap{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:90; display:flex; flex-direction:column; gap:8px; align-items:center; }
+.toast{ background:var(--bg-elev); border:1px solid var(--border-strong); color:var(--text); padding:10px 18px; border-radius:999px; font-size:13.5px; box-shadow:var(--shadow-2); animation:toastin .18s ease; }
+@keyframes toastin{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+/* theme swatches */
+.swatch-row{ display:flex; gap:10px; flex-wrap:wrap; }
+.swatch{ width:34px;height:34px; border-radius:50%; cursor:pointer; border:2px solid transparent; display:flex; align-items:center; justify-content:center; }
+.swatch.sel{ border-color:var(--text); }
+.mode-row{ display:flex; gap:8px; }
+.mode-btn{ flex:1; padding:9px; border-radius:9px; border:1px solid var(--border); background:var(--surface); color:var(--text-dim); cursor:pointer; font-size:13px; text-align:center; }
+.mode-btn.active{ border-color:var(--accent); color:var(--text); background:var(--accent-soft); }
+
+/* landing */
+.landing{ min-height:100vh; display:flex; flex-direction:column; align-items:center; }
+.landing-nav{ width:100%; max-width:1100px; display:flex; justify-content:space-between; align-items:center; padding:26px 24px; }
+.landing-hero{ text-align:center; padding:70px 24px 40px; max-width:680px; }
+.landing-hero h1{ font-family:var(--font-display); font-style:italic; font-size:46px; line-height:1.15; margin-bottom:18px; }
+.landing-hero p{ font-size:17px; color:var(--text-dim); margin-bottom:30px; line-height:1.6; }
+.landing-ctas{ display:flex; gap:12px; justify-content:center; }
+.landing-page-mock{ margin:30px auto 70px; width:min(560px,88vw); background:var(--paper); border:1px solid var(--paper-line); border-radius:18px; box-shadow:var(--shadow-2); padding:30px 34px; }
+.landing-page-mock .pd{ font-family:var(--font-display); font-style:italic; font-size:22px; margin-bottom:14px; }
+.landing-page-mock p{ color:var(--text-dim); font-size:15px; line-height:1.7; margin:0 0 10px; }
+.landing-sections{ width:100%; max-width:960px; padding:20px 24px 90px; }
+.how-grid, .feat-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:18px; }
+.how-card{ padding:22px; border:1px solid var(--border); border-radius:14px; background:var(--surface); }
+.how-card .num{ font-family:var(--font-display); font-style:italic; color:var(--accent); font-size:22px; margin-bottom:8px; }
+.how-card h4{ margin:0 0 6px; font-size:15.5px; }
+.how-card p{ margin:0; font-size:13.5px; color:var(--text-dim); line-height:1.5; }
+.feat-pill{ padding:16px 18px; border:1px solid var(--border); border-radius:12px; background:var(--surface); font-size:13.5px; color:var(--text-dim); }
+.landing-section-title{ font-family:var(--font-display); font-style:italic; font-size:24px; margin:56px 0 6px; text-align:center; }
+.landing-foot{ text-align:center; color:var(--text-faint); font-size:12.5px; padding:26px; border-top:1px solid var(--border); width:100%; }
+
+/* auth-ish gate (device profile, not a fake backend account system) */
+.gate-card{ width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px; margin:60px auto; }
+
+/* mobile */
+.mobile-nav{ display:none; }
+@media (max-width: 880px){
+  .sidebar{ display:none; }
+  .right-panel{ display:none !important; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border); background:var(--bg-elev); position:sticky; top:0; z-index:20; }
+  .content{ padding:20px 16px 90px; }
+  .mobile-nav{ display:flex; position:fixed; bottom:0; left:0; right:0; background:var(--bg-elev); border-top:1px solid var(--border); z-index:30; padding:6px 4px calc(6px + env(safe-area-inset-bottom)); justify-content:space-around; }
+  .mobile-nav button{ background:none; border:none; color:var(--text-faint); display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; cursor:pointer; padding:6px 8px; }
+  .mobile-nav button.active{ color:var(--accent); }
+  .mobile-nav svg{ width:19px;height:19px; }
+  .how-grid,.feat-grid{ grid-template-columns:1fr 1fr; }
+  .landing-hero h1{ font-size:32px; }
+}
+.hidden-sm{ display:none; }
+@media (min-width:881px){ .hidden-sm{ display:inherit; } }
+
+.focus-mode .sidebar, .focus-mode .right-panel, .focus-mode .mobile-nav, .focus-mode .topbar{ display:none !important; }
+.focus-mode .content{ max-width:680px; padding-top:60px; }
+.focus-exit{ position:fixed; top:18px; right:18px; z-index:40; }
+
+.link-btn{ background:none; border:none; color:var(--accent); cursor:pointer; font-size:13.5px; padding:0; font-family:inherit; }
+.muted{ color:var(--text-faint); font-size:13px; }
+.row{ display:flex; align-items:center; gap:8px; }
+.between{ display:flex; align-items:center; justify-content:space-between; }
+hr.sep{ border:none; border-top:1px solid var(--border); margin:16px 0; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toastWrap" class="toast-wrap"></div>
+<script>
+/* =========================================================
+   MyPages — client application
+   Persistence: window.storage (per-user, personal scope)
+   ========================================================= */
+
+const LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 4.5C5 3.67 5.67 3 6.5 3H16l3 3v12.5c0 .83-.67 1.5-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5v-14Z" fill="#fff" opacity=".18"/><path d="M7 15.8c2.2-3.3 4-6 4.6-7.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M13.2 8.2c1.1 2.2 2 4.6 2.6 7.4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M7 16.6h8.6" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+
+const ICONS = {
+  today:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17" stroke-linecap="round"/></svg>',
+  diary:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H15l4 4v12.5A1.5 1.5 0 0 1 17.5 21h-11A1.5 1.5 0 0 1 5 19.5v-15Z"/><path d="M9 10h6M9 14h6M9 17.5h4"/></svg>',
+  timeline:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h9M4 12h13M4 18h9" stroke-linecap="round"/><circle cx="19" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="20" cy="18" r="1.4" fill="currentColor" stroke="none"/></svg>',
+  calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/><circle cx="8" cy="14.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="14.5" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="14.5" r="1" fill="currentColor" stroke="none"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5" stroke-linecap="round"/></svg>',
+  fav:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 19s-7.5-4.6-9.3-9.3C1.7 6.6 3.4 4 6.3 4c2 0 3.5 1.4 5.7 4.3C14.2 5.4 15.7 4 17.7 4c2.9 0 4.6 2.6 3.6 5.7C19.5 14.4 12 19 12 19Z"/></svg>',
+  settings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V19.6a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H2.4a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1.1 1.7 1.7 0 0 0-.34-1.87l-.06-.06A2 2 0 1 1 6.47 3.7l.06.06a1.7 1.7 0 0 0 1.87.34h.06a1.7 1.7 0 0 0 1-1.55V2.4a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55h.06a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.06a1.7 1.7 0 0 0 1.55 1h.12a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0-.8 12a2 2 0 0 1-2 1.9H9.8a2 2 0 0 1-2-1.9L7 7" stroke-linecap="round"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>',
+  chevL:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  chevR:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3l2.6 5.6 6.1.7-4.6 4.1 1.3 6-5.4-3.1L6.6 19.4l1.3-6-4.6-4.1 6.1-.7L12 3z"/></svg>',
+  starO:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l2.6 5.6 6.1.7-4.6 4.1 1.3 6-5.4-3.1L6.6 19.4l1.3-6-4.6-4.1 6.1-.7L12 3z"/></svg>',
+  lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 1 1 8 0v2.5"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5.5c2.2-1 5-1.3 8 0v13c-3-1.3-5.8-1-8 0v-13Z"/><path d="M20 5.5c-2.2-1-5-1.3-8 0v13c3-1.3 5.8-1 8 0v-13Z"/></svg>',
+};
+
+/* ---------- storage helpers ---------- */
+const STORE_KEY = 'mypages:data';
+let STORE_VERSION_TOK = null;
+
+function defaultState(){
+  return {
+    settings:{
+      onboarded:false, theme:'dark', accent:'amber', font:'diary',
+      hidePreviews:false, autoLockMinutes:0, passcodeHash:null,
+      timezoneNote:null, savedLocations:['Home','School','Office','Park','Vacation']
+    },
+    entries: [],
+    searchHistory: []
+  };
+}
+
+async function loadState(){
+  try{
+    const res = await window.storage.get(STORE_KEY, false);
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      const d = defaultState();
+      return { settings:Object.assign(d.settings, parsed.settings||{}), entries: parsed.entries||[], searchHistory: parsed.searchHistory||[] };
+    }
+  }catch(e){ /* key not found yet */ }
+  return defaultState();
+}
+
+let saveTimer = null;
+let pendingSave = false;
+let lastSaveOk = true;
+
+async function persistNow(){
+  pendingSave = false;
+  setSaveStatus('saving');
+  try{
+    const res = await window.storage.set(STORE_KEY, JSON.stringify(STATE), false);
+    lastSaveOk = !!res;
+    setSaveStatus(lastSaveOk ? 'saved' : 'offline');
+  }catch(e){
+    lastSaveOk = false;
+    setSaveStatus('offline');
+  }
+}
+
+function scheduleSave(){
+  pendingSave = true;
+  setSaveStatus('saving');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(persistNow, 700);
+}
+
+function setSaveStatus(s){
+  SAVE_STATUS = s;
+  const el = document.getElementById('saveStatusEl');
+  if(!el) return;
+  el.className = 'save-status ' + s;
+  el.querySelector('span').textContent = s==='saving' ? 'Saving…' : s==='saved' ? 'Saved' : 'Offline — kept in this session';
+}
+let SAVE_STATUS = 'saved';
+
+window.addEventListener('online', ()=>{ if(pendingSave || !lastSaveOk) persistNow(); toast('Back online — syncing'); });
+window.addEventListener('beforeunload', ()=>{ if(pendingSave) persistNow(); });
+
+/* ---------- utils ---------- */
+function uid(){ return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function pad(n){ return n<10?'0'+n:''+n; }
+function toDateKey(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function parseDateKey(k){ const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d); }
+const MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function formatDiaryDate(k){ const d=parseDateKey(k); return d.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric', year:'numeric'}); }
+function formatShortDate(k){ const d=parseDateKey(k); return d.toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'}); }
+function formatTime(iso){ const d=new Date(iso); let h=d.getHours(); const m=pad(d.getMinutes()); const ap=h>=12?'PM':'AM'; h=h%12; if(h===0)h=12; return h+':'+m+' '+ap; }
+function formatDateTime(iso){ const d=new Date(iso); return d.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'})+' — '+formatTime(iso); }
+function esc(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function htmlToText(html){ const div=document.createElement('div'); div.innerHTML=html||''; return (div.textContent||'').replace(/\s+/g,' ').trim(); }
+function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
+function toast(msg){ const w=document.getElementById('toastWrap'); const t=document.createElement('div'); t.className='toast'; t.textContent=msg; w.appendChild(t); setTimeout(()=>t.remove(), 2600); }
+async function sha256(text){ const enc=new TextEncoder().encode(text); const buf=await crypto.subtle.digest('SHA-256', enc); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+const MOODS = [
+  {id:'great', label:'Great', emoji:'😄'}, {id:'good', label:'Good', emoji:'🙂'},
+  {id:'okay', label:'Okay', emoji:'😐'}, {id:'difficult', label:'Difficult', emoji:'😞'},
+  {id:'sad', label:'Sad', emoji:'😢'}, {id:'excited', label:'Excited', emoji:'🤩'},
+  {id:'calm', label:'Calm', emoji:'😌'}, {id:'angry', label:'Angry', emoji:'😠'},
+];
+function moodEmoji(id){ const m=MOODS.find(x=>x.id===id); return m?m.emoji:''; }
+function moodLabel(id){ const m=MOODS.find(x=>x.id===id); return m?m.label:id; }
+
+const ACCENTS = [
+  {id:'amber', label:'Amber (default)'}, {id:'blue', label:'Blue'}, {id:'pink', label:'Pink'},
+  {id:'red', label:'Red'}, {id:'purple', label:'Purple'}, {id:'green', label:'Green'}, {id:'teal', label:'Teal'},
+];
+
+/* ---------- app state ---------- */
+let STATE = null;
+let VIEW = 'today';
+let VIEW_PARAMS = {};
+let CAL_CURSOR = new Date();
+let LOCKED = false;
+let activityTimer = null;
+
+function activeEntries(){ return STATE.entries.filter(e=>!e.deleted); }
+function trashedEntries(){ return STATE.entries.filter(e=>e.deleted); }
+function getEntry(id){ return STATE.entries.find(e=>e.id===id); }
+
+function applyTheme(){
+  const s = STATE.settings;
+  let theme = s.theme;
+  if(theme==='system'){ theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light'; }
+  document.documentElement.setAttribute('data-theme', theme);
+  document.documentElement.setAttribute('data-accent', s.accent);
+  document.body.className = 'font-' + s.font;
+}
+
+/* ---------- entry model ---------- */
+function newEntryDraft(diaryDateKey){
+  const now = new Date();
+  return {
+    id: uid(), title:'', contentHTML:'', contentText:'',
+    createdAt: now.toISOString(), updatedAt: now.toISOString(),
+    diaryDate: diaryDateKey || toDateKey(now),
+    mood:null, tags:[], location:null, favorite:false, deleted:false, deletedAt:null,
+    versions:[]
+  };
+}
+
+function upsertEntry(entry){
+  const idx = STATE.entries.findIndex(e=>e.id===entry.id);
+  entry.updatedAt = new Date().toISOString();
+  if(idx>=0){
+    const prev = STATE.entries[idx];
+    if(prev.contentHTML !== entry.contentHTML){
+      entry.versions = (prev.versions||[]).concat([{content:prev.contentHTML, at:prev.updatedAt}]).slice(-5);
+    }
+    STATE.entries[idx] = entry;
+  } else {
+    STATE.entries.push(entry);
+  }
+  scheduleSave();
+}
+
+function deleteEntry(id, permanent){
+  const idx = STATE.entries.findIndex(e=>e.id===id);
+  if(idx<0) return;
+  if(permanent){ STATE.entries.splice(idx,1); }
+  else{ STATE.entries[idx].deleted=true; STATE.entries[idx].deletedAt=new Date().toISOString(); }
+  scheduleSave();
+}
+function restoreEntry(id){ const e=getEntry(id); if(e){ e.deleted=false; e.deletedAt=null; scheduleSave(); } }
+
+/* ---------- search ---------- */
+function buildIndexText(e){
+  return [e.title, e.contentText, (e.tags||[]).join(' '), e.location||'', moodLabel(e.mood||''), formatDiaryDate(e.diaryDate)].join(' ').toLowerCase();
+}
+function searchEntries(query, filters){
+  filters = filters||{};
+  let list = activeEntries();
+  const q = (query||'').trim().toLowerCase();
+  if(filters.favoritesOnly) list = list.filter(e=>e.favorite);
+  if(filters.tag) list = list.filter(e=>(e.tags||[]).includes(filters.tag));
+  if(filters.mood) list = list.filter(e=>e.mood===filters.mood);
+  if(filters.location) list = list.filter(e=>e.location===filters.location);
+  if(filters.dateFrom) list = list.filter(e=>e.diaryDate >= filters.dateFrom);
+  if(filters.dateTo) list = list.filter(e=>e.diaryDate <= filters.dateTo);
+  if(filters.hourFrom!=null && filters.hourTo!=null){
+    list = list.filter(e=>{ const h = new Date(e.createdAt).getHours(); return h>=filters.hourFrom && h<=filters.hourTo; });
+  }
+  let scored = list.map(e=>{
+    if(!q) return {e, score:1};
+    const text = buildIndexText(e);
+    if(!text.includes(q)) return null;
+    let score = 0;
+    if((e.title||'').toLowerCase().includes(q)) score += 5;
+    if((e.tags||[]).some(t=>t.toLowerCase().includes(q))) score += 4;
+    if(text.includes(q)) score += 1;
+    if((e.contentText||'').toLowerCase().startsWith(q)) score += 1;
+    return {e, score};
+  }).filter(Boolean);
+  scored.sort((a,b)=> b.score-a.score || (b.e.createdAt.localeCompare(a.e.createdAt)));
+  return scored.map(s=>s.e);
+}
+function highlight(text, q){
+  if(!q) return esc(text);
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if(idx<0) return esc(text);
+  return esc(text.slice(0,idx)) + '<mark>' + esc(text.slice(idx,idx+q.length)) + '</mark>' + esc(text.slice(idx+q.length));
+}
+
+/* ---------- rendering shell ---------- */
+function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
+function qs(sel,root){ return (root||document).querySelector(sel); }
+function qsa(sel,root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+function navItems(){
+  return [
+    {id:'today', label:'Today', icon:'today'},
+    {id:'diary', label:'Diary', icon:'diary'},
+    {id:'timeline', label:'Timeline', icon:'timeline'},
+    {id:'calendar', label:'Calendar', icon:'calendar'},
+    {id:'search', label:'Search', icon:'search'},
+    {id:'favorites', label:'Favorites', icon:'fav'},
+  ];
+}
+
+function renderShell(){
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  if(!STATE.settings.onboarded){ renderLanding(app); return; }
+  if(LOCKED){ renderLockScreen(app); return; }
+
+  const shell = el('<div class="shell"></div>');
+  const sidebar = el(`<div class="sidebar">
+    <div class="brand"><div class="brand-mark">${LOGO_SVG}</div><div class="brand-name">MyPages</div></div>
+    <button class="quick-add" id="quickAddBtn">${ICONS.plus} New page</button>
+  </div>`);
+  navItems().forEach(n=>{
+    const b = el(`<button class="nav-item ${VIEW===n.id?'active':''}" data-view="${n.id}">${ICONS[n.icon]}<span>${n.label}</span></button>`);
+    b.onclick = ()=>{ VIEW=n.id; VIEW_PARAMS={}; render(); };
+    sidebar.appendChild(b);
+  });
+  sidebar.appendChild(el('<div class="nav-sep"></div>'));
+  const foot = el('<div class="sidebar-foot"></div>');
+  [['settings','Settings','settings'],['trash','Trash','trash']].forEach(([id,label,icon])=>{
+    const b = el(`<button class="nav-item ${VIEW===id?'active':''}" data-view="${id}">${ICONS[icon]}<span>${label}</span></button>`);
+    b.onclick = ()=>{ VIEW=id; VIEW_PARAMS={}; render(); };
+    foot.appendChild(b);
+  });
+  sidebar.appendChild(foot);
+  qs('#quickAddBtn', sidebar) ? null : null;
+  shell.appendChild(sidebar);
+
+  const mainCol = el('<div class="main-col"></div>');
+  const content = el(`<div class="content ${['diary','timeline'].includes(VIEW)?'wide':''}" id="mainContent"></div>`);
+  mainCol.appendChild(content);
+
+  const showRight = VIEW==='entry' && !VIEW_PARAMS.focus;
+  const rp = el(`<div class="right-panel ${showRight?'':'hidden'}" id="rightPanel"></div>`);
+  mainCol.appendChild(rp);
+  shell.appendChild(mainCol);
+
+  app.appendChild(shell);
+
+  // mobile topbar
+  const topbar = el(`<div class="topbar hidden-sm-only">
+    <div class="row"><div class="brand-mark" style="width:26px;height:26px;">${LOGO_SVG}</div><strong style="font-family:var(--font-display);font-style:italic;">MyPages</strong></div>
+    <button class="icon-btn" id="mobSearchBtn">${ICONS.search}</button>
+  </div>`);
+  topbar.classList.add('topbar');
+  app.insertBefore(topbar, shell);
+  qs('#mobSearchBtn', topbar).onclick = ()=>{ VIEW='search'; render(); };
+
+  const mnav = el('<div class="mobile-nav"></div>');
+  [['today','Today','today'],['search','Search','search'],['timeline','Timeline','timeline'],['calendar','Calendar','calendar'],['settings','More','settings']].forEach(([id,label,icon])=>{
+    const b = el(`<button class="${VIEW===id?'active':''}">${ICONS[icon]}<span>${label}</span></button>`);
+    b.onclick = ()=>{ VIEW=id; VIEW_PARAMS={}; render(); };
+    mnav.appendChild(b);
+  });
+  app.appendChild(mnav);
+
+  qs('#quickAddBtn').onclick = quickAddPage;
+
+  if(VIEW_PARAMS.focus){ document.body.classList.add('focus-mode'); } else { document.body.classList.remove('focus-mode'); }
+
+  renderView(content, rp);
+}
+
+function quickAddPage(){
+  const d = newEntryDraft(toDateKey(new Date()));
+  VIEW='entry'; VIEW_PARAMS={id:d.id, draft:d, isNew:true};
+  render();
+}
+
+/* ---------- views ---------- */
+function renderView(content, rightPanel){
+  content.innerHTML='';
+  if(rightPanel) rightPanel.innerHTML='';
+  const map = { today:renderToday, diary:renderDiaryList, timeline:renderTimeline, calendar:renderCalendar,
+    search:renderSearch, favorites:renderFavorites, entry:renderEntryView, settings:renderSettings, trash:renderTrash };
+  (map[VIEW]||renderToday)(content, rightPanel);
+}
+
+function render(){ applyTheme(); renderShell(); }
+
+/* --- Today --- */
+function renderToday(content){
+  const today = new Date();
+  const key = toDateKey(today);
+  const header = el(`<div>
+    <h1 class="page-date">${today.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})}</h1>
+    <p class="page-sub">How was your day?</p>
+  </div>`);
+  content.appendChild(header);
+
+  const draft = newEntryDraft(key);
+  content.appendChild(buildComposer(draft, ()=>{ render(); }));
+
+  const todays = activeEntries().filter(e=>e.diaryDate===key).sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
+  if(todays.length){
+    content.appendChild(el(`<div class="section-title" style="margin-top:8px;">Today's pages</div>`));
+    const wrap = el('<div></div>');
+    todays.forEach(e=>wrap.appendChild(entryCard(e)));
+    content.appendChild(wrap);
+  }
+
+  const recent = activeEntries().filter(e=>e.diaryDate!==key).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).slice(0,5);
+  if(recent.length){
+    content.appendChild(el('<div class="section-title" style="margin-top:26px;">Recent pages</div>'));
+    const wrap = el('<div></div>');
+    recent.forEach(e=>wrap.appendChild(entryCard(e)));
+    content.appendChild(wrap);
+  }
+
+  const onThisDay = activeEntries().filter(e=>{
+    if(e.diaryDate===key) return false;
+    const d = parseDateKey(e.diaryDate);
+    return d.getMonth()===today.getMonth() && d.getDate()===today.getDate();
+  }).sort((a,b)=>b.diaryDate.localeCompare(a.diaryDate));
+  if(onThisDay.length){
+    content.appendChild(el('<div class="section-title" style="margin-top:26px;">On this day</div>'));
+    const wrap = el('<div></div>');
+    onThisDay.forEach(e=>{
+      const yearsAgo = today.getFullYear() - parseDateKey(e.diaryDate).getFullYear();
+      const card = entryCard(e);
+      const badge = el(`<div class="pill" style="margin-bottom:6px;">${yearsAgo} year${yearsAgo===1?'':'s'} ago</div>`);
+      card.insertBefore(badge, card.firstChild);
+      wrap.appendChild(card);
+    });
+    content.appendChild(wrap);
+  }
+
+  if(!activeEntries().length){
+    content.appendChild(emptyState('Your first page is waiting.', 'Write anything — MyPages will remember when.', 'Write your first page', ()=>quickAddPage()));
+  }
+}
+
+function emptyState(title, sub, btnLabel, onClick){
+  const e = el(`<div class="empty-state"><h3>${esc(title)}</h3><p>${esc(sub)}</p></div>`);
+  if(btnLabel){ const b = el(`<button class="btn">${esc(btnLabel)}</button>`); b.onclick=onClick; e.appendChild(b); }
+  return e;
+}
+
+/* --- composer (used on Today + quick add) --- */
+function buildComposer(draft, onSaved){
+  const wrap = el('<div class="composer"></div>');
+  wrap.appendChild(el('<div class="composer-prompt">What happened today?</div>'));
+  const toolbar = buildToolbar();
+  wrap.appendChild(toolbar);
+  const editor = el(`<div class="editor" contenteditable="true" data-placeholder="Write a page…"></div>`);
+  wrap.appendChild(editor);
+
+  const foot = el('<div class="composer-foot"></div>');
+  const chipRow = el('<div class="meta-chip-row"></div>');
+  const moodChip = el(`<button class="meta-chip">🙂 Mood</button>`);
+  const locChip = el(`<button class="meta-chip">📍 Location</button>`);
+  const tagChip = el(`<button class="meta-chip">#️⃣ Tags</button>`);
+  chipRow.append(moodChip, locChip, tagChip);
+  const saveBtn = el(`<button class="btn" style="padding:8px 16px;">Save page</button>`);
+  foot.append(chipRow, saveBtn);
+  wrap.appendChild(foot);
+
+  moodChip.onclick = ()=> openMoodPicker(draft.mood, (m)=>{ draft.mood=m; moodChip.textContent=(m?moodEmoji(m)+' '+moodLabel(m):'🙂 Mood'); moodChip.classList.toggle('set', !!m); });
+  locChip.onclick = ()=> openLocationPicker(draft.location, (l)=>{ draft.location=l; locChip.textContent = l ? '📍 '+l : '📍 Location'; locChip.classList.toggle('set', !!l); });
+  tagChip.onclick = ()=> openTagPicker(draft.tags, (tags)=>{ draft.tags=tags; tagChip.textContent = tags.length ? '#️⃣ '+tags.map(t=>'#'+t).join(' ') : '#️⃣ Tags'; tagChip.classList.toggle('set', tags.length>0); });
+
+  wireToolbar(toolbar, editor);
+
+  saveBtn.onclick = ()=>{
+    draft.contentHTML = editor.innerHTML;
+    draft.contentText = htmlToText(editor.innerHTML);
+    if(!draft.contentText){ toast('Write something first'); return; }
+    if(!draft.title) draft.title = draft.contentText.slice(0,60);
+    upsertEntry(draft);
+    toast('Page saved');
+    editor.innerHTML=''; draft.id=uid(); draft.contentHTML=''; draft.contentText=''; draft.title=''; draft.mood=null; draft.tags=[]; draft.location=null;
+    moodChip.textContent='🙂 Mood'; moodChip.classList.remove('set');
+    locChip.textContent='📍 Location'; locChip.classList.remove('set');
+    tagChip.textContent='#️⃣ Tags'; tagChip.classList.remove('set');
+    if(onSaved) onSaved();
+  };
+
+  return wrap;
+}
+
+function buildToolbar(){
+  const t = el('<div class="toolbar"></div>');
+  const btns = [
+    ['bold','<b>B</b>','bold'], ['italic','<i>I</i>','italic'], ['underline','<u>U</u>','underline'],
+    ['h','H','heading'], ['quote','&ldquo;&rdquo;','quote'], ['ul','•','ul'], ['ol','1.','ol'], ['check','☑','check'], ['link','🔗','link']
+  ];
+  btns.forEach(([id,html])=>{ t.appendChild(el(`<button type="button" class="tbtn" data-cmd="${id}">${html}</button>`)); });
+  return t;
+}
+function wireToolbar(toolbar, editor){
+  qsa('.tbtn', toolbar).forEach(b=>{
+    b.onclick = ()=>{
+      editor.focus();
+      const cmd = b.dataset.cmd;
+      if(cmd==='bold') document.execCommand('bold');
+      else if(cmd==='italic') document.execCommand('italic');
+      else if(cmd==='underline') document.execCommand('underline');
+      else if(cmd==='h') document.execCommand('formatBlock', false, 'h3');
+      else if(cmd==='quote') document.execCommand('formatBlock', false, 'blockquote');
+      else if(cmd==='ul') document.execCommand('insertUnorderedList');
+      else if(cmd==='ol') document.execCommand('insertOrderedList');
+      else if(cmd==='link'){ const url=prompt('Link URL:'); if(url) document.execCommand('createLink', false, url); }
+      else if(cmd==='check'){
+        document.execCommand('insertHTML', false, '<div class="checklist-row"><input type="checkbox"> <span contenteditable="true" style="flex:1;">&nbsp;</span></div>');
+      }
+    };
+  });
+  editor.addEventListener('click', (ev)=>{
+    if(ev.target.tagName==='INPUT' && ev.target.type==='checkbox'){ /* allow native toggle */ }
+  });
+}
+
+function entryCard(e, opts){
+  opts = opts||{};
+  const preview = (e.contentText||'').slice(0,160) || 'Untitled page';
+  const card = el(`<div class="entry-card">
+    <div class="entry-card-top">
+      <div class="entry-card-title">${opts.q ? highlight(e.title||'Untitled page', opts.q) : esc(e.title||'Untitled page')}</div>
+      <div class="entry-card-time">${formatShortDate(e.diaryDate)} • ${formatTime(e.createdAt)}</div>
+    </div>
+    <div class="entry-card-preview">${opts.q ? highlight(preview, opts.q) : esc(preview)}</div>
+    <div class="entry-card-meta"></div>
+  </div>`);
+  const metaRow = qs('.entry-card-meta', card);
+  if(e.favorite) metaRow.appendChild(el(`<span class="pill mood">${ICONS.star.replace('viewBox="0 0 24 24"','viewBox="0 0 24 24" width="10" height="10" style="display:inline"')} Favorite</span>`));
+  if(e.mood) metaRow.appendChild(el(`<span class="pill mood">${moodEmoji(e.mood)} ${moodLabel(e.mood)}</span>`));
+  if(e.location) metaRow.appendChild(el(`<span class="pill">📍 ${esc(e.location)}</span>`));
+  (e.tags||[]).slice(0,3).forEach(t=>metaRow.appendChild(el(`<span class="pill">#${esc(t)}</span>`)));
+  card.onclick = ()=>{ VIEW='entry'; VIEW_PARAMS={id:e.id}; render(); };
+  return card;
+}
+
+/* --- Diary list (paginated) --- */
+let DIARY_PAGE = 30;
+function renderDiaryList(content){
+  const list = activeEntries().sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+  content.appendChild(el('<h1 class="page-date">Diary</h1>'));
+  content.appendChild(el(`<p class="page-sub">${list.length} page${list.length===1?'':'s'} written</p>`));
+  if(!list.length){ content.appendChild(emptyState('Your first page is waiting.', 'Everything you write will appear here, organized automatically.', 'Write your first page', quickAddPage)); return; }
+  const wrap = el('<div></div>');
+  const slice = list.slice(0, DIARY_PAGE);
+  slice.forEach(e=>wrap.appendChild(entryCard(e)));
+  content.appendChild(wrap);
+  if(list.length > DIARY_PAGE){
+    const more = el(`<button class="btn ghost" style="width:100%;margin-top:10px;">Load more pages (${list.length - DIARY_PAGE} remaining)</button>`);
+    more.onclick = ()=>{ DIARY_PAGE += 30; render(); };
+    content.appendChild(more);
+  }
+}
+
+/* --- Timeline --- */
+function renderTimeline(content){
+  content.appendChild(el('<h1 class="page-date">Timeline</h1>'));
+  content.appendChild(el('<p class="page-sub">Your life, in order.</p>'));
+  const list = activeEntries().sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+  if(!list.length){ content.appendChild(emptyState('Nothing written here yet.', 'Your timeline will fill in as you write.', 'Write your first page', quickAddPage)); return; }
+  const byMonth = {};
+  list.forEach(e=>{ const d=parseDateKey(e.diaryDate); const mk = d.getFullYear()+'-'+pad(d.getMonth()+1); (byMonth[mk] = byMonth[mk]||[]).push(e); });
+  Object.keys(byMonth).sort().reverse().forEach(mk=>{
+    const [y,m] = mk.split('-').map(Number);
+    content.appendChild(el(`<div class="tl-month">${MONTH_NAMES[m-1]} ${y}</div>`));
+    const byDay = {};
+    byMonth[mk].forEach(e=>{ (byDay[e.diaryDate]=byDay[e.diaryDate]||[]).push(e); });
+    Object.keys(byDay).sort().reverse().forEach(dk=>{
+      const row = el(`<div class="tl-day"><div class="tl-day-label">${parseDateKey(dk).toLocaleDateString(undefined,{weekday:'short', day:'numeric'})}</div><div class="tl-day-entries"></div></div>`);
+      const holder = qs('.tl-day-entries', row);
+      byDay[dk].sort((a,b)=>a.createdAt.localeCompare(b.createdAt)).forEach(e=>holder.appendChild(entryCard(e)));
+      content.appendChild(row);
+    });
+  });
+}
+
+/* --- Calendar --- */
+function renderCalendar(content){
+  content.appendChild(el('<h1 class="page-date">Calendar</h1>'));
+  const head = el(`<div class="cal-head"><h3 id="calMonthLabel" style="font-family:var(--font-display);font-style:italic;"></h3>
+    <div class="cal-nav">
+      <button class="icon-btn" id="calPrev">${ICONS.chevL}</button>
+      <button class="icon-btn" id="calToday" style="width:auto;padding:0 12px;font-size:13px;">Today</button>
+      <button class="icon-btn" id="calNext">${ICONS.chevR}</button>
+    </div></div>`);
+  content.appendChild(head);
+  const grid = el('<div class="cal-grid"></div>');
+  content.appendChild(grid);
+  const dayPanel = el('<div id="calDayPanel" style="margin-top:24px;"></div>');
+  content.appendChild(dayPanel);
+
+  function draw(){
+    qs('#calMonthLabel').textContent = MONTH_NAMES[CAL_CURSOR.getMonth()] + ' ' + CAL_CURSOR.getFullYear();
+    grid.innerHTML='';
+    DOW.forEach(d=>grid.appendChild(el(`<div class="cal-dow">${d}</div>`)));
+    const first = new Date(CAL_CURSOR.getFullYear(), CAL_CURSOR.getMonth(), 1);
+    const startOffset = first.getDay();
+    const daysInMonth = new Date(CAL_CURSOR.getFullYear(), CAL_CURSOR.getMonth()+1, 0).getDate();
+    for(let i=0;i<startOffset;i++) grid.appendChild(el('<div class="cal-cell empty"></div>'));
+    const todayKey = toDateKey(new Date());
+    for(let day=1; day<=daysInMonth; day++){
+      const dk = CAL_CURSOR.getFullYear()+'-'+pad(CAL_CURSOR.getMonth()+1)+'-'+pad(day);
+      const count = activeEntries().filter(e=>e.diaryDate===dk).length;
+      const cell = el(`<div class="cal-cell ${dk===todayKey?'today':''} ${VIEW_PARAMS.selDate===dk?'selected':''}"><span>${day}</span>${count?'<div class="dot"></div>':''}</div>`);
+      cell.onclick = ()=>{ VIEW_PARAMS.selDate = dk; showDay(dk); qsa('.cal-cell', grid).forEach(c=>c.classList.remove('selected')); cell.classList.add('selected'); };
+      grid.appendChild(cell);
+    }
+  }
+  function showDay(dk){
+    dayPanel.innerHTML='';
+    const dayEntries = activeEntries().filter(e=>e.diaryDate===dk).sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
+    dayPanel.appendChild(el(`<div class="section-title">${formatDiaryDate(dk)}</div>`));
+    if(!dayEntries.length){
+      dayPanel.appendChild(emptyState('Nothing written on this day yet.', '', 'Write a page', ()=>{ const d=newEntryDraft(dk); VIEW='entry'; VIEW_PARAMS={id:d.id, draft:d, isNew:true}; render(); }));
+    } else {
+      dayEntries.forEach(e=>dayPanel.appendChild(entryCard(e)));
+    }
+  }
+  qs('#calPrev', head).onclick = ()=>{ CAL_CURSOR = new Date(CAL_CURSOR.getFullYear(), CAL_CURSOR.getMonth()-1, 1); draw(); };
+  qs('#calNext', head).onclick = ()=>{ CAL_CURSOR = new Date(CAL_CURSOR.getFullYear(), CAL_CURSOR.getMonth()+1, 1); draw(); };
+  qs('#calToday', head).onclick = ()=>{ CAL_CURSOR = new Date(); draw(); };
+  draw();
+  if(VIEW_PARAMS.selDate) showDay(VIEW_PARAMS.selDate);
+}
+
+/* --- Search --- */
+function renderSearch(content){
+  content.appendChild(el('<h1 class="page-date">Search</h1>'));
+  const bar = el(`<div class="search-bar">${ICONS.search.replace('currentColor','var(--text-faint)')}<input id="searchInput" placeholder='Try "football", "August 2026", "8 PM", or "school"'></div>`);
+  content.appendChild(bar);
+
+  const filters = { favoritesOnly:false, tag:null, mood:null, location:null, range:null };
+  const filterRow = el('<div class="filter-row"></div>');
+  const ranges = [['','Any time'],['today','Today'],['week','This week'],['month','This month'],['year','This year']];
+  ranges.forEach(([id,label])=>{
+    const p = el(`<button class="filter-pill ${id===''?'active':''}" data-range="${id}">${label}</button>`);
+    p.onclick = ()=>{ qsa('[data-range]',filterRow).forEach(x=>x.classList.remove('active')); p.classList.add('active'); filters.range = id||null; runSearch(); };
+    filterRow.appendChild(p);
+  });
+  const favPill = el(`<button class="filter-pill">★ Favorites</button>`);
+  favPill.onclick = ()=>{ filters.favoritesOnly=!filters.favoritesOnly; favPill.classList.toggle('active', filters.favoritesOnly); runSearch(); };
+  filterRow.appendChild(favPill);
+  content.appendChild(filterRow);
+
+  const resultsWrap = el('<div id="searchResults"></div>');
+  content.appendChild(resultsWrap);
+
+  function computeRangeBounds(r){
+    const now = new Date();
+    if(r==='today') return {from:toDateKey(now), to:toDateKey(now)};
+    if(r==='week'){ const d=new Date(now); d.setDate(d.getDate()-7); return {from:toDateKey(d), to:toDateKey(now)}; }
+    if(r==='month'){ const d=new Date(now.getFullYear(), now.getMonth(),1); return {from:toDateKey(d), to:toDateKey(now)}; }
+    if(r==='year'){ const d=new Date(now.getFullYear(),0,1); return {from:toDateKey(d), to:toDateKey(now)}; }
+    return {from:null,to:null};
+  }
+
+  function runSearch(){
+    const q = qs('#searchInput').value.trim();
+    const bounds = computeRangeBounds(filters.range);
+    const res = searchEntries(q, {favoritesOnly:filters.favoritesOnly, dateFrom:bounds.from, dateTo:bounds.to});
+    resultsWrap.innerHTML='';
+    if(!q && !filters.favoritesOnly && !filters.range){
+      const hist = STATE.searchHistory.slice(0,8);
+      if(hist.length){
+        resultsWrap.appendChild(el('<div class="section-title" style="margin-top:6px;">Recent searches</div>'));
+        const row = el('<div class="filter-row"></div>');
+        hist.forEach(h=>{ const t=el(`<button class="recent-search-tag">${esc(h)}</button>`); t.onclick=()=>{ qs('#searchInput').value=h; runSearch(); }; row.appendChild(t); });
+        const clear = el('<button class="link-btn">Clear history</button>');
+        clear.onclick = ()=>{ STATE.searchHistory=[]; scheduleSave(); runSearch(); };
+        resultsWrap.appendChild(row); resultsWrap.appendChild(clear);
+      }
+      return;
+    }
+    if(!res.length){ resultsWrap.appendChild(emptyState('No pages matched your search.', 'Try another word, date, or filter.')); return; }
+    resultsWrap.appendChild(el(`<div class="section-title">${res.length} result${res.length===1?'':'s'}</div>`));
+    res.forEach(e=>resultsWrap.appendChild(entryCard(e, {q})));
+  }
+
+  const input = qs('#searchInput', bar);
+  input.addEventListener('input', debounce(runSearch, 200));
+  input.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ const q=input.value.trim(); if(q){ STATE.searchHistory=[q].concat(STATE.searchHistory.filter(h=>h!==q)).slice(0,10); scheduleSave(); } } });
+  setTimeout(()=>input.focus(), 30);
+  runSearch();
+}
+
+/* --- Favorites --- */
+function renderFavorites(content){
+  content.appendChild(el('<h1 class="page-date">Favorites</h1>'));
+  const list = activeEntries().filter(e=>e.favorite).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+  if(!list.length){ content.appendChild(emptyState('Your favorite memories will appear here.', 'Mark any page as a favorite to save it here.')); return; }
+  content.appendChild(el(`<p class="page-sub">${list.length} favorite page${list.length===1?'':'s'}</p>`));
+  list.forEach(e=>content.appendChild(entryCard(e)));
+}
+
+/* --- Trash --- */
+function renderTrash(content){
+  content.appendChild(el('<h1 class="page-date">Trash</h1>'));
+  content.appendChild(el('<p class="page-sub">Deleted pages stay here until you remove them permanently.</p>'));
+  const list = trashedEntries().sort((a,b)=>(b.deletedAt||'').localeCompare(a.deletedAt||''));
+  if(!list.length){ content.appendChild(emptyState('Trash is empty.', '')); return; }
+  list.forEach(e=>{
+    const card = el(`<div class="entry-card" style="cursor:default;">
+      <div class="entry-card-top"><div class="entry-card-title">${esc(e.title||'Untitled page')}</div><div class="entry-card-time">${formatShortDate(e.diaryDate)}</div></div>
+      <div class="entry-card-preview">${esc((e.contentText||'').slice(0,140))}</div>
+      <div class="row" style="margin-top:10px;"></div>
+    </div>`);
+    const rowActions = qs('.row', card);
+    const restore = el('<button class="btn ghost" style="padding:6px 12px;font-size:13px;">Restore</button>');
+    restore.onclick = ()=>{ restoreEntry(e.id); toast('Page restored'); render(); };
+    const del = el('<button class="btn danger" style="padding:6px 12px;font-size:13px;">Delete permanently</button>');
+    del.onclick = ()=>{ confirmDialog('Delete permanently?', 'This cannot be undone.', ()=>{ deleteEntry(e.id, true); toast('Page permanently deleted'); render(); }); };
+    rowActions.append(restore, del);
+    content.appendChild(card);
+  });
+}
+
+/* --- Entry view/edit --- */
+function renderEntryView(content, rightPanel){
+  let entry = VIEW_PARAMS.draft || getEntry(VIEW_PARAMS.id);
+  if(!entry){ VIEW='diary'; render(); return; }
+  const isNew = !!VIEW_PARAMS.isNew;
+  let reading = !!VIEW_PARAMS.reading && !isNew;
+  const focus = !!VIEW_PARAMS.focus;
+
+  if(focus){
+    const exit = el(`<button class="icon-btn focus-exit" title="Exit focus mode (Esc)">${ICONS.close}</button>`);
+    exit.onclick = ()=>{ VIEW_PARAMS.focus=false; render(); };
+    document.getElementById('app').appendChild(exit);
+  }
+
+  const backRow = el(`<div class="between" style="margin-bottom:10px;">
+    <button class="link-btn" id="backBtn">&larr; Back</button>
+    <div class="row"></div>
+  </div>`);
+  const actions = qs('.row', backRow);
+  if(!isNew){
+    const favBtn = el(`<button class="icon-btn" title="Favorite">${entry.favorite?ICONS.star:ICONS.starO}</button>`);
+    favBtn.onclick = ()=>{ entry.favorite=!entry.favorite; upsertEntry(entry); render(); };
+    const readBtn = el(`<button class="icon-btn" title="Reading mode">${ICONS.book}</button>`);
+    readBtn.onclick = ()=>{ VIEW_PARAMS.reading = !reading; render(); };
+    const focusBtn = el(`<button class="icon-btn" title="Focus mode">${ICONS.today}</button>`);
+    focusBtn.onclick = ()=>{ VIEW_PARAMS.focus = true; render(); };
+    const delBtn = el(`<button class="icon-btn" title="Move to trash">${ICONS.trash}</button>`);
+    delBtn.onclick = ()=> confirmDialog('Move to trash?', 'You can restore it later from Trash.', ()=>{ deleteEntry(entry.id,false); toast('Page moved to trash'); VIEW='diary'; render(); });
+    actions.append(favBtn, readBtn, focusBtn, delBtn);
+  }
+  content.appendChild(backRow);
+  qs('#backBtn', backRow).onclick = ()=>{ VIEW = isNew? 'today':'diary'; VIEW_PARAMS={}; render(); };
+
+  content.appendChild(el(`<h1 class="page-date">${formatDiaryDate(entry.diaryDate)}</h1>`));
+  content.appendChild(el(`<p class="page-sub">Created ${formatDateTime(entry.createdAt)}${entry.updatedAt!==entry.createdAt? ' · Last edited '+formatDateTime(entry.updatedAt):''}</p>`));
+
+  if(reading){
+    const box = el(`<div class="composer"><div class="entry-content" style="font-size:18px;line-height:1.75;">${entry.contentHTML||'<p><em>Empty page.</em></p>'}</div></div>`);
+    content.appendChild(box);
+  } else {
+    const wrap = el('<div class="composer"></div>');
+    const titleInput = el(`<input placeholder="Untitled page" value="${esc(entry.title)}" style="width:100%;border:none;background:none;outline:none;font-family:var(--font-display);font-style:italic;font-size:20px;color:var(--text);margin-bottom:12px;">`);
+    wrap.appendChild(titleInput);
+    const toolbar = buildToolbar();
+    wrap.appendChild(toolbar);
+    const editor = el(`<div class="editor" contenteditable="true" data-placeholder="Write a page…">${entry.contentHTML||''}</div>`);
+    wrap.appendChild(editor);
+    wireToolbar(toolbar, editor);
+
+    const foot = el('<div class="composer-foot"></div>');
+    const chipRow = el('<div class="meta-chip-row"></div>');
+    const moodChip = el(`<button class="meta-chip ${entry.mood?'set':''}">${entry.mood? moodEmoji(entry.mood)+' '+moodLabel(entry.mood) : '🙂 Mood'}</button>`);
+    const locChip = el(`<button class="meta-chip ${entry.location?'set':''}">${entry.location? '📍 '+esc(entry.location) : '📍 Location'}</button>`);
+    const tagChip = el(`<button class="meta-chip ${entry.tags&&entry.tags.length?'set':''}">${entry.tags&&entry.tags.length? '#️⃣ '+entry.tags.map(t=>'#'+t).join(' ') : '#️⃣ Tags'}</button>`);
+    const dateChip = el(`<button class="meta-chip">📅 ${formatShortDate(entry.diaryDate)}</button>`);
+    chipRow.append(dateChip, moodChip, locChip, tagChip);
+    const statusEl = el(`<div class="save-status saved" id="saveStatusEl"><div class="save-dot"></div><span>Saved</span></div>`);
+    foot.append(chipRow, statusEl);
+    wrap.appendChild(foot);
+    content.appendChild(wrap);
+
+    moodChip.onclick = ()=> openMoodPicker(entry.mood, (m)=>{ entry.mood=m; commit(); });
+    locChip.onclick = ()=> openLocationPicker(entry.location, (l)=>{ entry.location=l; commit(); });
+    tagChip.onclick = ()=> openTagPicker(entry.tags||[], (tags)=>{ entry.tags=tags; commit(); });
+    dateChip.onclick = ()=> openDatePicker(entry.diaryDate, (dk)=>{ entry.diaryDate=dk; commit(); render(); });
+
+    const doSave = debounce(()=>{
+      entry.title = titleInput.value.trim();
+      entry.contentHTML = editor.innerHTML;
+      entry.contentText = htmlToText(editor.innerHTML);
+      if(!entry.title && entry.contentText) entry.title = entry.contentText.slice(0,60);
+      upsertEntry(entry);
+      if(isNew){ VIEW_PARAMS.isNew=false; VIEW_PARAMS.draft=null; VIEW_PARAMS.id=entry.id; }
+    }, 700);
+    function commit(){ entry.contentHTML=editor.innerHTML; entry.contentText=htmlToText(editor.innerHTML); upsertEntry(entry); render(); }
+    editor.addEventListener('input', doSave);
+    titleInput.addEventListener('input', doSave);
+
+    setTimeout(()=>{ if(isNew) editor.focus(); }, 30);
+  }
+
+  if(!isNew && !focus && rightPanel){
+    rightPanel.appendChild(el('<div class="section-title">Page details</div>'));
+    rightPanel.appendChild(el(`<div class="muted">Created<br><strong style="color:var(--text)">${formatDateTime(entry.createdAt)}</strong></div>`));
+    rightPanel.appendChild(el(`<div class="muted">Last edited<br><strong style="color:var(--text)">${formatDateTime(entry.updatedAt)}</strong></div>`));
+    if(entry.versions && entry.versions.length){
+      rightPanel.appendChild(el('<hr class="sep">'));
+      rightPanel.appendChild(el('<div class="section-title">Page history</div>'));
+      entry.versions.slice().reverse().forEach(v=>{
+        const row = el(`<div class="between" style="margin-bottom:6px;"><span class="muted">${formatDateTime(v.at)}</span></div>`);
+        const restoreBtn = el('<button class="link-btn">Restore</button>');
+        restoreBtn.onclick = ()=> confirmDialog('Restore this version?', 'Your current text will be kept in history too.', ()=>{ entry.contentHTML=v.content; entry.contentText=htmlToText(v.content); upsertEntry(entry); render(); });
+        row.appendChild(restoreBtn);
+        rightPanel.appendChild(row);
+      });
+    }
+  }
+}
+
+/* --- pickers --- */
+function openMoodPicker(current, cb){
+  openModal('How are you feeling?', (body,close)=>{
+    const grid = el('<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;"></div>');
+    MOODS.forEach(m=>{
+      const b = el(`<button class="btn ghost" style="flex-direction:column;display:flex;gap:4px;padding:12px 4px;${current===m.id?'border-color:var(--accent);':''}"><span style="font-size:22px;">${m.emoji}</span><span style="font-size:11.5px;">${m.label}</span></button>`);
+      b.onclick = ()=>{ cb(m.id); close(); };
+      grid.appendChild(b);
+    });
+    body.appendChild(grid);
+    if(current){ const clear=el('<button class="link-btn" style="margin-top:14px;">Remove mood</button>'); clear.onclick=()=>{ cb(null); close(); }; body.appendChild(clear); }
+  });
+}
+function openLocationPicker(current, cb){
+  openModal('Add a location', (body,close)=>{
+    const list = el('<div class="filter-row"></div>');
+    STATE.settings.savedLocations.forEach(l=>{
+      const p = el(`<button class="filter-pill ${current===l?'active':''}">${esc(l)}</button>`);
+      p.onclick = ()=>{ cb(l); close(); };
+      list.appendChild(p);
+    });
+    body.appendChild(list);
+    const field = el(`<div class="field" style="margin-top:14px;"><label>Custom location</label><input id="customLoc" placeholder="e.g. Grandma's house" value="${current&&!STATE.settings.savedLocations.includes(current)?esc(current):''}"></div>`);
+    body.appendChild(field);
+    const row = el('<div class="modal-actions"></div>');
+    if(current){ const clear=el('<button class="btn ghost">Remove</button>'); clear.onclick=()=>{ cb(null); close(); }; row.appendChild(clear); }
+    const save = el('<button class="btn">Save</button>');
+    save.onclick = ()=>{ const v = qs('#customLoc',body).value.trim(); if(v){ if(!STATE.settings.savedLocations.includes(v)){ STATE.settings.savedLocations.push(v); scheduleSave(); } cb(v); close(); } };
+    row.appendChild(save);
+    body.appendChild(row);
+  });
+}
+function openTagPicker(current, cb){
+  let tags = (current||[]).slice();
+  openModal('Tags', (body,close)=>{
+    const chips = el('<div class="filter-row" id="tagChips"></div>');
+    function drawChips(){
+      chips.innerHTML='';
+      tags.forEach(t=>{ const c=el(`<span class="filter-pill active">#${esc(t)} &nbsp;✕</span>`); c.onclick=()=>{ tags=tags.filter(x=>x!==t); drawChips(); }; chips.appendChild(c); });
+    }
+    drawChips();
+    body.appendChild(chips);
+    const field = el('<div class="field" style="margin-top:10px;"><label>Add a tag and press Enter</label><input id="tagInput" placeholder="school"></div>');
+    body.appendChild(field);
+    const input = qs('#tagInput', field);
+    input.addEventListener('keydown', (ev)=>{
+      if(ev.key==='Enter'){ ev.preventDefault(); const v=input.value.trim().replace(/^#/,'').toLowerCase(); if(v && !tags.includes(v)){ tags.push(v); drawChips(); } input.value=''; }
+    });
+    const allTags = Array.from(new Set(activeEntries().flatMap(e=>e.tags||[])));
+    if(allTags.length){
+      body.appendChild(el('<div class="muted" style="margin-top:10px;">Existing tags</div>'));
+      const row = el('<div class="filter-row" style="margin-top:6px;"></div>');
+      allTags.filter(t=>!tags.includes(t)).forEach(t=>{ const p=el(`<button class="filter-pill">#${esc(t)}</button>`); p.onclick=()=>{ tags.push(t); drawChips(); }; row.appendChild(p); });
+      body.appendChild(row);
+    }
+    const actions = el('<div class="modal-actions"></div>');
+    const save = el('<button class="btn">Save tags</button>');
+    save.onclick = ()=>{ cb(tags); close(); };
+    actions.appendChild(save);
+    body.appendChild(actions);
+  });
+}
+function openDatePicker(current, cb){
+  openModal('Diary date', (body,close)=>{
+    body.appendChild(el(`<p class="muted" style="margin-bottom:12px;">Set which day this page is filed under. The original creation time is always preserved separately.</p>`));
+    const field = el(`<div class="field"><label>Date</label><input type="date" id="dateInput" value="${current}"></div>`);
+    body.appendChild(field);
+    const actions = el('<div class="modal-actions"></div>');
+    const save = el('<button class="btn">Save</button>');
+    save.onclick = ()=>{ const v = qs('#dateInput',body).value; if(v) cb(v); close(); };
+    actions.appendChild(save);
+    body.appendChild(actions);
+  });
+}
+
+/* --- modal / confirm / command palette --- */
+function openModal(title, builder, wide){
+  const bg = el(`<div class="overlay-bg"></div>`);
+  const modal = el(`<div class="modal ${wide?'wide':''}" role="dialog" aria-modal="true"></div>`);
+  modal.appendChild(el(`<h3>${esc(title)}</h3>`));
+  const body = el('<div></div>');
+  modal.appendChild(body);
+  bg.appendChild(modal);
+  document.body.appendChild(bg);
+  const close = ()=>bg.remove();
+  bg.onclick = (ev)=>{ if(ev.target===bg) close(); };
+  const onEsc = (ev)=>{ if(ev.key==='Escape'){ close(); document.removeEventListener('keydown', onEsc); } };
+  document.addEventListener('keydown', onEsc);
+  builder(body, close);
+  return {close};
+}
+function confirmDialog(title, sub, onConfirm){
+  openModal(title, (body,close)=>{
+    body.appendChild(el(`<p class="muted">${esc(sub)}</p>`));
+    const row = el('<div class="modal-actions"></div>');
+    const cancel = el('<button class="btn ghost">Cancel</button>'); cancel.onclick=close;
+    const ok = el('<button class="btn danger">Confirm</button>'); ok.onclick=()=>{ onConfirm(); close(); };
+    row.append(cancel, ok);
+    body.appendChild(row);
+  });
+}
+
+function openCommandPalette(){
+  const bg = el('<div class="cmdk"></div>');
+  const box = el(`<div class="cmdk-box"><input class="cmdk-input" placeholder="Jump to, search, or run a command…"><div class="cmdk-list"></div></div>`);
+  bg.appendChild(box); document.body.appendChild(bg);
+  const input = qs('.cmdk-input', box), list = qs('.cmdk-list', box);
+  const actions = [
+    {label:'New page', run:quickAddPage},
+    {label:'Search diary', run:()=>{ VIEW='search'; render(); }},
+    {label:'Jump to today', run:()=>{ VIEW='today'; render(); }},
+    {label:'Open timeline', run:()=>{ VIEW='timeline'; render(); }},
+    {label:'Open calendar', run:()=>{ VIEW='calendar'; render(); }},
+    {label:'Open favorites', run:()=>{ VIEW='favorites'; render(); }},
+    {label:'Open settings', run:()=>{ VIEW='settings'; render(); }},
+  ];
+  function draw(q){
+    list.innerHTML='';
+    q=(q||'').toLowerCase();
+    actions.filter(a=>a.label.toLowerCase().includes(q)).forEach(a=>{
+      const it = el(`<div class="cmdk-item"><span>${esc(a.label)}</span></div>`);
+      it.onclick = ()=>{ bg.remove(); a.run(); };
+      list.appendChild(it);
+    });
+    if(q){
+      const res = searchEntries(q,{}).slice(0,6);
+      res.forEach(e=>{
+        const it = el(`<div class="cmdk-item"><span>${esc(e.title||'Untitled page')}</span><span class="cmdk-hint">${formatShortDate(e.diaryDate)}</span></div>`);
+        it.onclick = ()=>{ bg.remove(); VIEW='entry'; VIEW_PARAMS={id:e.id}; render(); };
+        list.appendChild(it);
+      });
+    }
+  }
+  draw('');
+  input.addEventListener('input', ()=>draw(input.value));
+  bg.onclick = (ev)=>{ if(ev.target===bg) bg.remove(); };
+  document.addEventListener('keydown', function onEsc(ev){ if(ev.key==='Escape'){ bg.remove(); document.removeEventListener('keydown', onEsc); } });
+  setTimeout(()=>input.focus(),20);
+}
+
+/* ---------- settings ---------- */
+function renderSettings(content){
+  content.appendChild(el('<h1 class="page-date">Settings</h1>'));
+
+  // Appearance
+  content.appendChild(el('<div class="section-title" style="margin-top:8px;">Appearance</div>'));
+  const appearanceBox = el('<div class="composer" style="padding:20px 22px;"></div>');
+  appearanceBox.appendChild(el('<div class="muted" style="margin-bottom:8px;">Theme</div>'));
+  const modeRow = el('<div class="mode-row" style="margin-bottom:18px;"></div>');
+  [['light','Light'],['dark','Dark'],['system','System']].forEach(([id,label])=>{
+    const b = el(`<button class="mode-btn ${STATE.settings.theme===id?'active':''}">${label}</button>`);
+    b.onclick = ()=>{ STATE.settings.theme=id; scheduleSave(); render(); };
+    modeRow.appendChild(b);
+  });
+  appearanceBox.appendChild(modeRow);
+
+  appearanceBox.appendChild(el('<div class="muted" style="margin-bottom:8px;">Diary color</div>'));
+  const swatchRow = el('<div class="swatch-row" style="margin-bottom:18px;"></div>');
+  const swatchColors = {amber:'#D9963A',blue:'#5E86AE',pink:'#C97B94',red:'#B2584B',purple:'#9274AE',green:'#748F63',teal:'#4E8E88'};
+  ACCENTS.forEach(a=>{
+    const s = el(`<button class="swatch ${STATE.settings.accent===a.id?'sel':''}" title="${a.label}" style="background:${swatchColors[a.id]}"></button>`);
+    s.onclick = ()=>{ STATE.settings.accent=a.id; scheduleSave(); render(); };
+    swatchRow.appendChild(s);
+  });
+  appearanceBox.appendChild(swatchRow);
+
+  appearanceBox.appendChild(el('<div class="muted" style="margin-bottom:8px;">Writing font</div>'));
+  const fontRow = el('<div class="mode-row"></div>');
+  [['diary','Diary'],['serif','Serif'],['modern','Modern'],['mono','Monospace']].forEach(([id,label])=>{
+    const b = el(`<button class="mode-btn ${STATE.settings.font===id?'active':''}">${label}</button>`);
+    b.onclick = ()=>{ STATE.settings.font=id; scheduleSave(); render(); };
+    fontRow.appendChild(b);
+  });
+  appearanceBox.appendChild(fontRow);
+  content.appendChild(appearanceBox);
+
+  // Privacy & lock
+  content.appendChild(el('<div class="section-title" style="margin-top:26px;">Privacy</div>'));
+  const privBox = el('<div class="composer" style="padding:20px 22px;"></div>');
+  const hideRow = el(`<div class="between"><div><div>Hide diary previews</div><div class="muted">Keep recent page text off the dashboard.</div></div></div>`);
+  const hideToggle = el(`<button class="mode-btn ${STATE.settings.hidePreviews?'active':''}" style="flex:none;padding:8px 14px;">${STATE.settings.hidePreviews?'On':'Off'}</button>`);
+  hideToggle.onclick = ()=>{ STATE.settings.hidePreviews=!STATE.settings.hidePreviews; scheduleSave(); render(); };
+  hideRow.appendChild(hideToggle);
+  privBox.appendChild(hideRow);
+  privBox.appendChild(el('<hr class="sep">'));
+
+  const lockRow = el(`<div class="between"><div><div>Diary passcode lock</div><div class="muted">${STATE.settings.passcodeHash? 'A passcode protects this diary on this device.' : 'Add a passcode to lock MyPages on this device.'}</div></div></div>`);
+  const lockBtn = el(`<button class="btn ghost" style="flex:none;">${STATE.settings.passcodeHash?'Change / Remove':'Set passcode'}</button>`);
+  lockBtn.onclick = ()=> openPasscodeSetup();
+  lockRow.appendChild(lockBtn);
+  privBox.appendChild(lockRow);
+
+  if(STATE.settings.passcodeHash){
+    privBox.appendChild(el('<hr class="sep">'));
+    privBox.appendChild(el('<div class="muted" style="margin-bottom:8px;">Lock after</div>'));
+    const autoRow = el('<div class="mode-row"></div>');
+    [[0,'Never'],[1,'1 min'],[5,'5 min'],[15,'15 min']].forEach(([mins,label])=>{
+      const b = el(`<button class="mode-btn ${STATE.settings.autoLockMinutes===mins?'active':''}">${label}</button>`);
+      b.onclick = ()=>{ STATE.settings.autoLockMinutes=mins; scheduleSave(); resetActivityTimer(); render(); };
+      autoRow.appendChild(b);
+    });
+    privBox.appendChild(autoRow);
+  }
+  content.appendChild(privBox);
+
+  // Data
+  content.appendChild(el('<div class="section-title" style="margin-top:26px;">Your data</div>'));
+  const dataBox = el('<div class="composer" style="padding:20px 22px;"></div>');
+  const stats = computeStats();
+  dataBox.appendChild(el(`<p class="muted">${stats.total} page${stats.total===1?'':'s'} · ${stats.words.toLocaleString()} words · ${stats.days} day${stats.days===1?'':'s'} journaled${stats.streak>1?' · '+stats.streak+'-day writing streak':''}</p>`));
+  const btnRow = el('<div class="row" style="flex-wrap:wrap;gap:8px;margin-top:12px;"></div>');
+  const expJson = el('<button class="btn ghost">Export as JSON</button>'); expJson.onclick=()=>exportData('json');
+  const expMd = el('<button class="btn ghost">Export as Markdown</button>'); expMd.onclick=()=>exportData('md');
+  const expTxt = el('<button class="btn ghost">Export as text</button>'); expTxt.onclick=()=>exportData('txt');
+  const expPdf = el('<button class="btn ghost">Print / Save as PDF</button>'); expPdf.onclick=()=>printExport();
+  const imp = el('<button class="btn ghost">Import</button>'); imp.onclick=()=>openImportDialog();
+  btnRow.append(expJson, expMd, expTxt, expPdf, imp);
+  dataBox.appendChild(btnRow);
+  dataBox.appendChild(el('<hr class="sep">'));
+  const delAll = el('<button class="btn danger">Delete all data</button>');
+  delAll.onclick = ()=> confirmDialog('Delete everything?', 'This permanently deletes all pages on this device/account and cannot be undone.', ()=>{ STATE = defaultState(); STATE.settings.onboarded=true; scheduleSave(); render(); });
+  dataBox.appendChild(delAll);
+  content.appendChild(dataBox);
+
+  content.appendChild(el(`<p class="muted" style="margin-top:20px;">MyPages saves your pages to your account's private storage. Your diary is private by default and only you can access it.</p>`));
+}
+
+function computeStats(){
+  const list = activeEntries();
+  const words = list.reduce((s,e)=>s + (e.contentText||'').split(/\s+/).filter(Boolean).length, 0);
+  const days = new Set(list.map(e=>e.diaryDate)).size;
+  const sortedDays = Array.from(new Set(list.map(e=>e.diaryDate))).sort().reverse();
+  let streak=0; let cursor=new Date();
+  for(let i=0;i<sortedDays.length;i++){
+    const key = toDateKey(cursor);
+    if(sortedDays.includes(key)){ streak++; cursor.setDate(cursor.getDate()-1); } else break;
+  }
+  return {total:list.length, words, days, streak};
+}
+
+/* passcode lock */
+async function openPasscodeSetup(){
+  openModal(STATE.settings.passcodeHash? 'Change passcode':'Set a passcode', (body,close)=>{
+    body.appendChild(el('<div class="field"><label>New passcode</label><input type="password" id="pc1" inputmode="numeric"></div>'));
+    body.appendChild(el('<div class="field"><label>Confirm passcode</label><input type="password" id="pc2" inputmode="numeric"></div>'));
+    const row = el('<div class="modal-actions"></div>');
+    if(STATE.settings.passcodeHash){ const rm=el('<button class="btn danger">Remove lock</button>'); rm.onclick=()=>{ STATE.settings.passcodeHash=null; scheduleSave(); close(); render(); }; row.appendChild(rm); }
+    const save = el('<button class="btn">Save</button>');
+    save.onclick = async ()=>{
+      const p1 = qs('#pc1',body).value, p2 = qs('#pc2',body).value;
+      if(!p1 || p1.length<4){ toast('Use at least 4 characters'); return; }
+      if(p1!==p2){ toast("Passcodes don't match"); return; }
+      STATE.settings.passcodeHash = await sha256(p1);
+      scheduleSave(); close(); render(); toast('Passcode set');
+    };
+    row.appendChild(save);
+    body.appendChild(row);
+  });
+}
+function renderLockScreen(app){
+  const wrap = el(`<div class="landing"><div class="gate-card" style="text-align:center;">
+    <div class="brand-mark" style="margin:0 auto 16px;width:44px;height:44px;">${LOGO_SVG}</div>
+    <h3 style="font-family:var(--font-display);font-style:italic;margin-bottom:6px;">MyPages is locked</h3>
+    <p class="muted" style="margin-bottom:18px;">Enter your passcode to continue.</p>
+    <input type="password" id="unlockInput" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;letter-spacing:4px;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);margin-bottom:14px;">
+    <button class="btn" id="unlockBtn" style="width:100%;">Unlock</button>
+    <div class="muted" id="unlockErr" style="margin-top:10px;color:#C1554B;"></div>
+  </div></div>`);
+  app.appendChild(wrap);
+  const input = qs('#unlockInput', wrap);
+  const tryUnlock = async ()=>{
+    const h = await sha256(input.value);
+    if(h === STATE.settings.passcodeHash){ LOCKED=false; resetActivityTimer(); render(); }
+    else{ qs('#unlockErr',wrap).textContent = 'Incorrect passcode.'; input.value=''; }
+  };
+  qs('#unlockBtn', wrap).onclick = tryUnlock;
+  input.addEventListener('keydown', ev=>{ if(ev.key==='Enter') tryUnlock(); });
+  setTimeout(()=>input.focus(), 30);
+}
+function resetActivityTimer(){
+  clearTimeout(activityTimer);
+  const mins = STATE.settings.autoLockMinutes;
+  if(!STATE.settings.passcodeHash || !mins) return;
+  activityTimer = setTimeout(()=>{ LOCKED=true; render(); }, mins*60*1000);
+}
+['mousemove','keydown','click','touchstart'].forEach(evt=>document.addEventListener(evt, ()=>{ if(!LOCKED) resetActivityTimer(); }));
+
+/* ---------- export / import ---------- */
+function exportData(fmt){
+  const list = activeEntries().sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
+  let out='', mime='text/plain', filename='mypages-export.txt';
+  if(fmt==='json'){
+    out = JSON.stringify({exportedAt:new Date().toISOString(), entries:list.map(e=>({title:e.title,content:e.contentText,contentHTML:e.contentHTML,createdAt:e.createdAt,updatedAt:e.updatedAt,diaryDate:e.diaryDate,mood:e.mood,tags:e.tags,location:e.location,favorite:e.favorite}))}, null, 2);
+    mime='application/json'; filename='mypages-export.json';
+  } else if(fmt==='md'){
+    out = list.map(e=>`## ${e.title||'Untitled page'}\n*${formatDiaryDate(e.diaryDate)} — ${formatTime(e.createdAt)}*\n${e.location?`\n📍 ${e.location}`:''}${e.mood?`  ${moodEmoji(e.mood)} ${moodLabel(e.mood)}`:''}${(e.tags&&e.tags.length)?`\n\nTags: ${e.tags.map(t=>'#'+t).join(' ')}`:''}\n\n${e.contentText}\n`).join('\n---\n\n');
+    mime='text/markdown'; filename='mypages-export.md';
+  } else {
+    out = list.map(e=>`${formatDiaryDate(e.diaryDate)} — ${formatTime(e.createdAt)}\n${e.title||'Untitled page'}\n${'-'.repeat(30)}\n${e.contentText}\n`).join('\n\n');
+    filename='mypages-export.txt';
+  }
+  const blob = new Blob([out], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast('Export downloaded');
+}
+function printExport(){
+  const list = activeEntries().sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
+  const w = window.open('', '_blank');
+  w.document.write(`<html><head><title>MyPages export</title><style>body{font-family:Georgia,serif;max-width:680px;margin:40px auto;line-height:1.6;color:#222;} h2{margin-top:2em;} .meta{color:#777;font-size:13px;}</style></head><body>` +
+    list.map(e=>`<h2>${esc(e.title||'Untitled page')}</h2><div class="meta">${esc(formatDiaryDate(e.diaryDate))} — ${esc(formatTime(e.createdAt))}${e.location?' · '+esc(e.location):''}</div><div>${e.contentHTML||''}</div>`).join('<hr>') +
+    `</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(), 300);
+}
+function openImportDialog(){
+  openModal('Import pages', (body, close)=>{
+    body.appendChild(el('<p class="muted" style="margin-bottom:12px;">Import a MyPages JSON export, or a plain text / Markdown file (one page per file). Existing pages are never removed.</p>'));
+    const inputEl = el('<input type="file" accept=".json,.txt,.md">');
+    body.appendChild(inputEl);
+    const preview = el('<div style="margin-top:14px;"></div>');
+    body.appendChild(preview);
+    let parsedEntries = [];
+    inputEl.onchange = ()=>{
+      const file = inputEl.files[0]; if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        try{
+          if(file.name.endsWith('.json')){
+            const data = JSON.parse(reader.result);
+            parsedEntries = (data.entries||[]).map(e=>({
+              id:uid(), title:e.title||'', contentHTML:e.contentHTML||`<p>${esc(e.content||'')}</p>`, contentText:e.content||htmlToText(e.contentHTML||''),
+              createdAt:e.createdAt||new Date().toISOString(), updatedAt:e.updatedAt||e.createdAt||new Date().toISOString(),
+              diaryDate:e.diaryDate||toDateKey(new Date()), mood:e.mood||null, tags:e.tags||[], location:e.location||null, favorite:!!e.favorite, deleted:false, deletedAt:null, versions:[]
+            }));
+          } else {
+            const text = reader.result;
+            const d = newEntryDraft(toDateKey(new Date()));
+            d.title = file.name.replace(/\.(txt|md)$/,'');
+            d.contentText = text;
+            d.contentHTML = text.split(/\n{2,}/).map(p=>`<p>${esc(p)}</p>`).join('');
+            parsedEntries = [d];
+          }
+          preview.innerHTML = `<p class="muted">${parsedEntries.length} page${parsedEntries.length===1?'':'s'} ready to import.</p>`;
+        }catch(err){ preview.innerHTML = '<p class="muted" style="color:#C1554B;">Could not read that file.</p>'; }
+      };
+      reader.readAsText(file);
+    };
+    const actions = el('<div class="modal-actions"></div>');
+    const doImport = el('<button class="btn">Import</button>');
+    doImport.onclick = ()=>{
+      if(!parsedEntries.length){ toast('Choose a file first'); return; }
+      STATE.entries = STATE.entries.concat(parsedEntries);
+      scheduleSave(); close(); render(); toast(parsedEntries.length+' page(s) imported');
+    };
+    actions.appendChild(doImport);
+    body.appendChild(actions);
+  }, true);
+}
+
+/* ---------- landing / onboarding ---------- */
+function renderLanding(app){
+  const wrap = el(`<div class="landing">
+    <div class="landing-nav">
+      <div class="row"><div class="brand-mark">${LOGO_SVG}</div><span class="brand-name">MyPages</span></div>
+      <button class="btn" id="landingStart">Start writing</button>
+    </div>
+    <div class="landing-hero">
+      <h1>Your life. Your pages. Your story.</h1>
+      <p>A private digital diary where every moment can have a page — and every page can be found again.</p>
+      <div class="landing-ctas">
+        <button class="btn" id="heroStart">Start writing</button>
+        <button class="btn ghost" id="heroExplore">Explore MyPages</button>
+      </div>
+    </div>
+    <div class="landing-page-mock">
+      <div class="pd">${new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</div>
+      <p>Started the morning slow — coffee on the balcony, the kind of quiet that makes you want to write things down before they slip away.</p>
+      <p style="color:var(--text-faint);font-size:13px;">7:42 AM · Home</p>
+    </div>
+    <div class="landing-sections" id="landingSections"></div>
+    <div class="landing-foot">MyPages · Private by default</div>
+  </div>`);
+  const sections = qs('#landingSections', wrap);
+  sections.appendChild(el('<div class="landing-section-title">How it works</div>'));
+  const how = el('<div class="how-grid"></div>');
+  [['1','Write','Write anything about your day, whenever you want.'],['2','MyPages remembers','Entries are automatically organized by date and time.'],['3','Find it later','Search your diary whenever you want to revisit a memory.']].forEach(([n,t,d])=>{
+    how.appendChild(el(`<div class="how-card"><div class="num">${n}</div><h4>${t}</h4><p>${d}</p></div>`));
+  });
+  sections.appendChild(how);
+
+  sections.appendChild(el('<div class="landing-section-title">What\'s inside</div>'));
+  const feat = el('<div class="feat-grid"></div>');
+  ['Infinite pages','Powerful search','Automatic timestamps','Timeline & calendar','Location tags','Mood tracking','Tags & favorites','Autosave','Passcode lock','Export anytime'].forEach(f=>feat.appendChild(el(`<div class="feat-pill">${esc(f)}</div>`)));
+  sections.appendChild(feat);
+
+  app.appendChild(wrap);
+  const go = ()=>{ VIEW_PARAMS.showOnboard=true; renderOnboardGate(); };
+  qs('#landingStart', wrap).onclick = go;
+  qs('#heroStart', wrap).onclick = go;
+  qs('#heroExplore', wrap).onclick = ()=>{ qs('.landing-sections', wrap).scrollIntoView({behavior:'smooth'}); };
+}
+function renderOnboardGate(){
+  const app = document.getElementById('app'); app.innerHTML='';
+  const wrap = el(`<div class="landing"><div class="gate-card">
+    <div class="brand-mark" style="margin:0 auto 16px;width:44px;height:44px;">${LOGO_SVG}</div>
+    <h3 style="font-family:var(--font-display);font-style:italic;text-align:center;margin-bottom:8px;">Welcome to MyPages</h3>
+    <p class="muted" style="text-align:center;margin-bottom:22px;">This is your space. Start with today's page.</p>
+    <button class="btn" id="beginBtn" style="width:100%;">Write today's entry</button>
+    <p class="muted" style="margin-top:16px;font-size:12.5px;text-align:center;">Your pages are saved privately to your account. Automatic timestamps, search, and a timeline are ready as soon as you start writing.</p>
+  </div></div>`);
+  app.appendChild(wrap);
+  qs('#beginBtn', wrap).onclick = ()=>{ STATE.settings.onboarded=true; scheduleSave(); VIEW='today'; render(); toast('Welcome to MyPages'); };
+}
+
+/* ---------- keyboard shortcuts ---------- */
+document.addEventListener('keydown', (ev)=>{
+  if(!STATE || !STATE.settings.onboarded || LOCKED) return;
+  const mod = ev.metaKey || ev.ctrlKey;
+  if(mod && ev.key.toLowerCase()==='k'){ ev.preventDefault(); openCommandPalette(); }
+  else if(ev.key==='Escape' && VIEW_PARAMS.focus){ VIEW_PARAMS.focus=false; render(); }
+});
+
+/* ---------- boot ---------- */
+async function boot(){
+  STATE = await loadState();
+  applyTheme();
+  LOCKED = !!STATE.settings.passcodeHash;
+  if(LOCKED) resetActivityTimer();
+  render();
+}
+boot();
+</script>
+</body>
+</html>
